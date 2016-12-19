@@ -4,3 +4,6 @@ C:\Users\treba\OneDrive\C#\DziennikWydatkow\DziennikWydatkow\bin\Debug\DziennikW
 C:\Users\treba\OneDrive\C#\DziennikWydatkow\DziennikWydatkow\obj\Debug\DziennikWydatkow.csprojResolveAssemblyReference.cache
 C:\Users\treba\OneDrive\C#\DziennikWydatkow\DziennikWydatkow\obj\Debug\DziennikWydatkow.exe
 C:\Users\treba\OneDrive\C#\DziennikWydatkow\DziennikWydatkow\obj\Debug\DziennikWydatkow.pdb
+C:\Users\treba\OneDrive\Expense-Tracker\DziennikWydatkow\bin\Debug\DziennikWydatkow.exe.config
+C:\Users\treba\OneDrive\Expense-Tracker\DziennikWydatkow\obj\Debug\DziennikWydatkow.exe
+C:\Users\treba\OneDrive\Expense-Tracker\DziennikWydatkow\obj\Debug\DziennikWydatkow.pdb
