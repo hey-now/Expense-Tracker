@@ -49,7 +49,12 @@ namespace DziennikWydatkow
         public void editAmountOf(int index, decimal amount)
         {
             Expense changed = ExpenseList[index];
+            if ((int)changed.Category * amount < 0)
+            {
+                throw new AmountCategoryIncosistencyException("Wydatki powinny mieć kwotę dodatnią, a przychody ujemną.");
+            }
             changed.Amount = amount;
+            
             ExpenseList[index] = changed;
         }
 
@@ -63,6 +68,10 @@ namespace DziennikWydatkow
         public void editCategoryOf(int index, Categories category )
         {
             Expense changed = ExpenseList[index];
+            if ((int)category * changed.Amount < 0)
+            {
+                throw new AmountCategoryIncosistencyException("Wydatki powinny mieć kwotę dodatnią, a przychody ujemną.");
+            }
             changed.Category = category;
             ExpenseList[index] = changed;
         }
@@ -84,15 +93,16 @@ namespace DziennikWydatkow
         public void printWithIndexes(DateTime startDate, DateTime endDate)
         {
             var report = from e in ExpenseList
-                        where (e.TransactionDate > startDate && e.TransactionDate < endDate)
-                        select e;
+                         where (e.TransactionDate > startDate && e.TransactionDate < endDate)
+                         orderby e.TransactionDate
+                         select e;
 
                       
-            Console.WriteLine("  | {0,-10} | {1,-10} | {2,-15} | {3,-20} | {4,-40}|", "1. Data", "2. Kwota", "3. Kategoria", "4. Tytuł", "5. Notatka");
-            Console.WriteLine(new string('-', 110));
+            Console.WriteLine("  Nr  | {0,-10} | {1,-10} | {2,-15} | {3,-20} | {4,-40}|", "1. Data", "2. Kwota", "3. Kategoria", "4. Tytuł", "5. Notatka");
+            Console.WriteLine(new string('-', 116));
             foreach (Expense expense in report.ToList())
             {
-                Console.WriteLine(ExpenseList.IndexOf(expense) + " " + expense.ToString());
+                Console.WriteLine(" {0,4} {1}", ExpenseList.IndexOf(expense), expense.ToString());
             }
          
         }

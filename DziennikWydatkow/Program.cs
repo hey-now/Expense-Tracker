@@ -14,23 +14,23 @@ namespace DziennikWydatkow
         static void login()
         {
             Console.WriteLine("\n[LOGOWANIE]\n");
-            Console.WriteLine("Podaj nazwę użytkownika");
+            Console.Write("Podaj nazwę użytkownika: ");
             string login = Console.ReadLine();
 
             if (!users.userExists(login))
             {
-                Console.WriteLine("Podany użytkoenik nie istnieje. Przejście do zakładania nowego konta.");
+                Console.WriteLine("Podany użytkownik nie istnieje. Przejście do zakładania nowego konta.");
                 newAccount();
                 return;
             }
 
-            Console.WriteLine("Podaj hasło");
+            Console.Write("Podaj hasło: ");
             string pass = Console.ReadLine();
 
             while (!users.UserList.Find(x => String.Compare(x.Username, login) == 0).checkPassword(pass))
             {
-                Console.WriteLine("Podano złe hasło, spróbój ponownie.");
-                Console.WriteLine("Podaj hasło:");
+                Console.WriteLine("Podano złe hasło, spróbuj ponownie.");
+                Console.Write("Podaj hasło: ");
                 pass = Console.ReadLine();
             }
 
@@ -38,7 +38,7 @@ namespace DziennikWydatkow
             user.Expenses = new ExpenseTracker();
             user.Expenses.Deserialize(user.Username);
 
-            Console.WriteLine("Zalogowano pomyślnie.");
+            Console.WriteLine("\nZalogowano pomyślnie.");
 
             mainMenu();
 
@@ -79,15 +79,23 @@ namespace DziennikWydatkow
             int userInput = 0;
             do
             {
-                Console.WriteLine("\nMENU\n");
+                Console.WriteLine("\n[MENU]\n");
                 Console.WriteLine("1 - Dodaj wpis");
                 Console.WriteLine("2 - Edytuj / usuń wpis");
                 Console.WriteLine("3 - Generuj raport");
                 Console.WriteLine("4 - Zmiana hasła");
-                Console.WriteLine("0 - Zakończ");
+                Console.WriteLine("0 - Wyloguj \n");
 
                 string result = Console.ReadLine();
-                userInput = Convert.ToInt32(result);
+                try
+                {
+                    userInput = Convert.ToInt32(result);
+                }
+                catch (System.FormatException e)
+                {
+                    Console.WriteLine("Nieprawidłowe dane. Oczekiwano cyfry, podano: " + result);
+                    mainMenu();
+                }
 
                 switch (userInput)
                 {
@@ -106,6 +114,7 @@ namespace DziennikWydatkow
                     case 0:
                         return;
                     default:
+                        Console.WriteLine("Nieprawidłowe dane. Oczekiwano cyfry z zakresu 0-4, podano: " + userInput);
                         break;             
                 }
             } while (userInput != 0);
@@ -126,8 +135,10 @@ namespace DziennikWydatkow
             return;
         }
 
+
         private static void reports()
         {
+            Console.WriteLine("\n[TRYB RAPOTOWANIA]\n");
 
             int userInput = 0;
             do
@@ -140,19 +151,24 @@ namespace DziennikWydatkow
                 Console.WriteLine("0 - Zakończ");
 
                 string result = Console.ReadLine();
-                userInput = Convert.ToInt32(result);
+
+                try
+                {
+                    userInput = Convert.ToInt32(result);
+                }
+                catch (System.FormatException e)
+                {
+                    Console.WriteLine("Nieprawidłowe dane. Oczekiwano cyfry, podano: " + result);
+                    reports();
+                }
 
                 if (userInput == 0) return;
 
                 Console.WriteLine("Podaj date poczatkową (w formacie dd/mm/yyyy):");
-                string dateString = Console.ReadLine();
-                string[] dateStrings = dateString.Split('/');
-                DateTime startDate = new DateTime(Convert.ToInt32(dateStrings[2]), Convert.ToInt32(dateStrings[1]), Convert.ToInt32(dateStrings[0]));
+                DateTime startDate = chooseDate();
 
                 Console.WriteLine("Podaj date końcową (w formacie dd/mm/yyyy):");
-                dateString = Console.ReadLine();
-                dateStrings = dateString.Split('/');
-                DateTime endDate = new DateTime(Convert.ToInt32(dateStrings[2]), Convert.ToInt32(dateStrings[1]), Convert.ToInt32(dateStrings[0]));
+                DateTime endDate = chooseDate();
 
                 Console.WriteLine(startDate.ToString() + endDate);
 
@@ -178,25 +194,56 @@ namespace DziennikWydatkow
                         break;
                     case 0:
                         return;
-
+                    default:
+                        Console.WriteLine("Nieprawidłowe dane. Oczekiwano cyfry z zakresu 0-4, podano: " + userInput);
+                        break;
                 }
-
-                mainMenu();
-
             } while (userInput != 0);
           
         }
 
+        private static DateTime chooseDate()
+        {
+            //Obsługa wprowadzania daty prze użytkownika 
+
+            string dateString = Console.ReadLine();
+            DateTime chosenDate = new DateTime();
+
+            try {
+                string[] dateStrings = dateString.Split('/');
+                chosenDate = new DateTime(Convert.ToInt32(dateStrings[2]), Convert.ToInt32(dateStrings[1]), Convert.ToInt32(dateStrings[0]));
+            }
+            catch (System.IndexOutOfRangeException e)
+            {
+                Console.WriteLine("Niepełna data, podano: " + dateString + "\n Podaj nową:");
+                chosenDate = chooseDate();
+            }
+            catch (System.FormatException e)
+            {
+                Console.WriteLine("Nieprawidłowa data, podano: " + dateString + "\n Podaj nową:");
+                chosenDate = chooseDate();
+            }
+            catch (System.ArgumentOutOfRangeException e)
+            {
+                Console.WriteLine("Nieprawidłowa data, podano: "+ dateString + "\n Podaj nową:");
+                chosenDate = chooseDate();
+            }
+
+            return chosenDate;
+        }
+
         private static Sorting chooseSorting()
         {
-            Console.WriteLine("Lista typów sortowania");
+            //Wybór sortowania przez użytkownika
+
+            Console.WriteLine("\n Lista typów sortowania");
             List<Sorting> sortingList = Enum.GetValues(typeof(Sorting)).Cast<Sorting>().ToList();
             foreach (Sorting s in sortingList)
             {
                 Console.WriteLine((int)s + " - " + s.ToString());
             }
 
-            Console.WriteLine("Który typ sortowania wybierasz?");
+            Console.WriteLine("Nr typu sortowania: ");
 
             string input = Console.ReadLine();
             Sorting  sort = (Sorting)Convert.ToInt32(input);
@@ -206,14 +253,16 @@ namespace DziennikWydatkow
 
         private static Categories chooseCategory()
         {
-            Console.WriteLine("Lista kategorii");
+            //Wybór kategorii przez użytkownika
+
+            Console.WriteLine("\nLista kategorii:");
             List<Categories> categoriesList = Enum.GetValues(typeof(Categories)).Cast<Categories>().ToList();
             foreach (Categories c in categoriesList)
             {
                 Console.WriteLine((int)c + " - " + c.ToString());
             }
 
-            Console.WriteLine("Którą kategorię wybierasz?");
+            Console.Write("Podaj nr kategorii: ");
 
             string input = Console.ReadLine();
             Categories category = (Categories)Convert.ToInt32(input);
@@ -221,20 +270,37 @@ namespace DziennikWydatkow
             return category;
         }
 
+        private static decimal chooseAmount()
+        {
+            //Obsługa wprowadzania kwoty przez użytkownika 
+
+            string input = Console.ReadLine();
+            decimal amount;
+            
+            try
+            {
+               amount = Convert.ToDecimal(input);
+            }         
+            catch (System.FormatException e)
+            {
+                Console.WriteLine("Nieprawidłowa wartość, podano: " + input + "\n Podaj nową:");
+                amount = chooseAmount();
+            }
+
+            return amount;
+        }
+
+
         private static void editExpense()
         {
             Console.WriteLine("\n[TRYB EDYCJI]\n");
 
             Console.WriteLine("W jakim zakresie czasowym był wpis do edycji?");
-            Console.WriteLine("Podaj date poczatkową (w formacie dd/mm/yyyy):");
-            string dateString = Console.ReadLine();
-            string[] dateStrings = dateString.Split('/');
-            DateTime startDate = new DateTime(Convert.ToInt32(dateStrings[2]), Convert.ToInt32(dateStrings[1]), Convert.ToInt32(dateStrings[0]));
+            Console.Write("Podaj date poczatkową (w formacie dd/mm/yyyy): ");
+            DateTime startDate = chooseDate();
 
-            Console.WriteLine("Podaj date końcową (w formacie dd/mm/yyyy):");
-            dateString = Console.ReadLine();
-            dateStrings = dateString.Split('/');
-            DateTime endDate = new DateTime(Convert.ToInt32(dateStrings[2]), Convert.ToInt32(dateStrings[1]), Convert.ToInt32(dateStrings[0]));
+            Console.Write("Podaj date końcową (w formacie dd/mm/yyyy): ");
+            DateTime endDate = chooseDate();
 
             user.Expenses.printWithIndexes(startDate,endDate);
 
@@ -242,19 +308,28 @@ namespace DziennikWydatkow
             string input = Console.ReadLine();
             int nr = Convert.ToInt32(input);
 
-            
-
             int userInput = 0;
             do
             {
-                Console.WriteLine("Wybrano\n" + user.Expenses[nr].ToString()+ "\n");
+                Console.WriteLine("Wybrano: ");        
+                Console.WriteLine("| {0,-10} | {1,-10} | {2,-15} | {3,-20} | {4,-40}|", "1. Data", "2. Kwota", "3. Kategoria", "4. Tytuł", "5. Notatka");
+                Console.WriteLine(new string('-', 110));
+                Console.WriteLine(user.Expenses[nr].ToString() + "\n");
 
                 Console.WriteLine("1 - Usuń");
                 Console.WriteLine("2 - Edytuj");
                 Console.WriteLine("0 - Zapisz i zakończ");
 
                 string result = Console.ReadLine();
-                userInput = Convert.ToInt32(result);
+                try
+                {
+                    userInput = Convert.ToInt32(result);
+                }
+                catch (System.FormatException e)
+                {
+                    Console.WriteLine("Nieprawidłowe dane. Oczekiwano cyfry, podano: " + result);
+                    userInput = -1;
+                }
 
                 switch (userInput)
                 {
@@ -264,45 +339,68 @@ namespace DziennikWydatkow
                     case 2:
                         Console.WriteLine("Podaj nr kolumny do edycji:");
                         input = Console.ReadLine();
-                        nr = Convert.ToInt32(input);
-
-                        Console.WriteLine("Podaj nową wartość:");
-                        input = Console.ReadLine();
+                        int col = 0;
+                        try
+                        {
+                            col = Convert.ToInt32(input);
                        
-                        switch (nr)
+                        switch (col)
                         {
                             case 1:
-                                dateString = Console.ReadLine();
-                                dateStrings = dateString.Split('/');
-                                DateTime date = new DateTime(Convert.ToInt32(dateStrings[2]), Convert.ToInt32(dateStrings[1]), Convert.ToInt32(dateStrings[0]));
-                                user.Expenses.editDateOf(nr, date);
-                                break;
+                                    Console.Write("Podaj nową datę: ");
+                                    DateTime date = chooseDate();
+                                    user.Expenses.editDateOf(nr, date);
+                                    break;
                             case 2:
-                                decimal amount = Convert.ToDecimal(input);
-                                user.Expenses.editAmountOf(nr, amount);
-                                break;
+                                    Console.Write("Podaj nową kwotę: ");
+                                    decimal amount = chooseAmount();
+                                    user.Expenses.editAmountOf(nr, amount);
+                                    break;
                             case 3:
-                                Categories category = (Categories)Convert.ToInt32(input);
-                                user.Expenses.editCategoryOf(nr, category);
-                                break;
+                                    Categories category = chooseCategory();
+                                    user.Expenses.editCategoryOf(nr, category);
+                                    break;
                             case 4:
-                                user.Expenses.editTitleOf(nr, input);
-                                break;
+                                    Console.WriteLine("Podaj nowy tutuł: ");
+                                    input = Console.ReadLine();
+                                    user.Expenses.editTitleOf(nr, input);
+                                    break;
                             case 5:
-                                user.Expenses.editNoteOf(nr, input);
-                                break;
+                                    Console.WriteLine("Podaj nową notatkę: ");
+                                    input = Console.ReadLine();
+                                    user.Expenses.editNoteOf(nr, input);
+                                    break;
+             
+                            default:
+                                    Console.WriteLine("Nieprawidłowe dane. Oczekiwano cyfry z zakresu 1-5, podano: " + nr);
+                                    break;
                         }
 
-                        Console.WriteLine("Zmieniony wpis:\n" + user.Expenses[nr].ToString() + "\n");
+                        
+                            Console.WriteLine("Obecny wpis: ");
+                            Console.WriteLine("| {0,-10} | {1,-10} | {2,-15} | {3,-20} | {4,-40}|", "1. Data", "2. Kwota", "3. Kategoria", "4. Tytuł", "5. Notatka");
+                            Console.WriteLine(new string('-', 110));
+                            Console.WriteLine(user.Expenses[nr].ToString() + "\n");
 
+                        }
+                        catch (AmountCategoryIncosistencyException e)
+                        {
+                            Console.WriteLine("Spróbuj ponownie.");
+                        }
+                        catch (System.FormatException e)
+                        {
+                            Console.WriteLine("Nieprawidłowe dane. Oczekiwano cyfry, input: " + result);
+                        }
                         break;
                     case 0:
                         user.Expenses.Serialize(user.Username);
                         return;
-
+                    case -1:
+                        break;
+                    default:
+                        Console.WriteLine("Nieprawidłowe dane. Oczekiwano cyfry z zakresu 0-2, podano: " + userInput);
+                        break;
                 }
-
-                mainMenu();
 
             } while (userInput != 0);
 
@@ -312,31 +410,40 @@ namespace DziennikWydatkow
         private static void newExpense()
         {
             Console.WriteLine("\n[DODAWANIE WPISU]\n");
-            Console.WriteLine("Podaj wydatek w formacie dd/mm/yyyy:kwota:nr kategori:tytul:notatka\n");
+            Console.WriteLine("Wprowadź dane"); 
+            Console.Write("Data (w formacie dd/mm/yyyy): ");
+            DateTime date = chooseDate();
 
-            Console.WriteLine("Lista kategorii");
-            List<Categories> categoriesList = Enum.GetValues(typeof(Categories)).Cast<Categories>().ToList();
-            foreach(Categories c in categoriesList)
-            {
-                Console.WriteLine((int)c + " - " + c.ToString());
+            Console.Write("Kwota: ");
+            decimal amount = chooseAmount();
+
+            Categories category = chooseCategory();
+
+            Console.Write("Tytul: ");
+            string title = Console.ReadLine();
+
+            Console.Write("Notatka: ");
+            string note = Console.ReadLine();
+
+            try {
+                Expense newE = new Expense(date, amount, category, title, note);
+                user.Expenses.add(newE);
+
+                Console.WriteLine("Wpis dodany pomyślnie");
+
+                Console.WriteLine();
+                Console.WriteLine("| {0,-10} | {1,-10} | {2,-15} | {3,-20} | {4,-40}|", "1. Data", "2. Kwota", "3. Kategoria", "4. Tytuł", "5. Notatka");
+                Console.WriteLine(new string('-', 110));
+                Console.WriteLine(newE.ToString() + "\n");
+
+                user.Expenses.Serialize(user.Username);
             }
-
-            Console.WriteLine("\nPodaj wpis");
-            string expenseString = Console.ReadLine();
-            string[] expenseData = expenseString.Split(':');
-
-            string[] dateStrings = expenseData[0].Split('/');
-            DateTime date = new DateTime(Convert.ToInt32(dateStrings[2]), Convert.ToInt32(dateStrings[1]), Convert.ToInt32(dateStrings[0]));
-            decimal amount = Convert.ToDecimal(expenseData[1]);
-            Categories category = (Categories)Convert.ToInt32(expenseData[2]);
-            string title = expenseData[3];
-            string note = expenseData[4];
-
-            user.Expenses.add(new Expense(date, amount, category, title, note));
-
-            Console.WriteLine("Wpis dodany pomyślnie");
-
-            user.Expenses.Serialize(user.Username);
+            catch (AmountCategoryIncosistencyException e)
+            {
+                Console.WriteLine("Spróbuj ponownie.");
+                newExpense();
+                return;
+            }
 
             return;
 
@@ -375,53 +482,9 @@ namespace DziennikWydatkow
                                     
                 }
 
-               
-
             } while (userInput != 0);
 
                   
-
-            /*
-
-       ////     Console.WriteLine(users.userExists("Maja"));
-        //    users.addUser(new User("Maja", "maslo"));
-       //     Console.WriteLine(users.userExists("Maja"));
-
-         //  user = new User("Maja", "maslo");
-            user.Expenses.Deserialize(user.Username);
-
-            //user.Expenses.add(new Expense(new DateTime(2016, 12, 1), (decimal)7.95, Categories.Jedzenie, "Obiad", "Subway"));
-            //user.Expenses.add(new Expense(new DateTime(2016, 12, 1), (decimal)24.90, Categories.Dom, "Patelnia", ""));
-            //user.Expenses.add(new Expense(new DateTime(2016, 12, 2), (decimal)109.00, Categories.Okazjonalne, "Lot", "Bilet do Londynu"));
-            //user.Expenses.add(new Expense(new DateTime(2016, 12, 3), (decimal)8.00, Categories.Rozrywka, "Piwo", "Pawilony"));
-            //user.Expenses.add(new Expense(new DateTime(2016, 12, 3), (decimal)22.40, Categories.Jedzenie, "Kolacja", "Manekin"));
-            //user.Expenses.add(new Expense(new DateTime(2016, 12, 4), (decimal)35.00, Categories.Rozrywka, "Kino", "Star Wars"));
-            //user.Expenses.add(new Expense(new DateTime(2016, 12, 4), (decimal)10.00, Categories.Inne, "Parking", "Złote tarasy"));
-            //user.Expenses.add(new Expense(new DateTime(2016, 12, 5), (decimal)24.90, Categories.Dom, "Patelnia", ""));
-
-            DateTime s = DateTime.Today.AddMonths(-3);
-            DateTime e = DateTime.Today;
-
-            user.Expenses.printWithIndexes(s,e);
-
-            Expense changed = new Expense(new DateTime(2016, 12, 2, 7, 0, 0), (decimal)8.00, Categories.Rozrywka, "Piwo", "Spectrum");
-            user.Expenses.edit(2, changed);
-
-            user.Expenses.editAmountOf(3, (decimal)200.00);
-            //user.Expenses.ToXml();
-            user.Expenses.printWithIndexes(s,e);
-
-           
-
-            user.Expenses.GenerateGeneralReport(s,e,(Sorting)(-2));
-
-            user.Expenses.GenerateCategoryReport(s, e, Categories.Okazjonalne);
-
-           // user.ExpenseTrackerReports.endDate = DateTime.Today.AddMonths(-1);
-            user.Expenses.GenerateMaxExpensesReport(s, e, 5);
-
-            user.Expenses.GenerateStructuralReport(s, e);
- */
             user.Expenses.Serialize(user.Username);
            
             users.Serialize();

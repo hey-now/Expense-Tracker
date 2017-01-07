@@ -133,12 +133,12 @@ namespace DziennikWydatkow
         */
         public static void GenerateStructuralReport(this ExpenseTracker tracker, DateTime startDate , DateTime endDate)
         {
-            Console.WriteLine("\n[RAPORT KATEGORII]\n");
+            Console.WriteLine("\n[RAPORT STRUKTURY WYDATKÓW]\n");
 
             List<Categories> categoriesList = Enum.GetValues(typeof(Categories)).Cast<Categories>().ToList();
 
 
-            var report = from e in tracker.ExpenseList
+            var report = from e in tracker.ExpenseList                       
                          group e by e.Category into cat
                          select new
                           {
@@ -147,11 +147,10 @@ namespace DziennikWydatkow
                             TotalAmount = cat.Sum(e => e.Amount)
                           }; 
 
-            decimal ExpenseSum = tracker.ExpenseList.Sum(x => ((int)x.Category == -1)?0:x.Amount); //suma wydatków i.e. wpisow z kategorii innych niż prychod (-1)
-            //decimal Income = report.ToList().Where(x => (int)x.Category == -1).Select(x => x.TotalAmount).First();
-             decimal IncomeSum = tracker.ExpenseList.Sum(x => ((int)x.Category == -1)?x.Amount:0);
+            decimal ExpenseSum = tracker.ExpenseList.Sum(x => ((int)x.Category == -1)?0:x.Amount); 
+            decimal IncomeSum = tracker.ExpenseList.Sum(x => ((int)x.Category == -1)?x.Amount:0);
 
-            Console.WriteLine("| {0,-15} | {1,10} | {2,10} |", "Kategoria", "Ilość", "Suma");
+            Console.WriteLine("| {0,-15} | {1,10} | {2,10} | {3,4}  |", "Kategoria", "Ilość", "Suma", "% wydatków");
             Console.WriteLine(new string('-', 45));
             foreach (var row in report.ToList())
             {

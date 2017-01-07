@@ -12,12 +12,26 @@ namespace DziennikWydatkow
     
     public enum Categories
     {
-        Jedzenie,
+        Jedzenie = 1,
         Dom,
         Rozrywka,
         Okazjonalne,
-        Inne,
+        Transport,
+        Inne = 0,
         Przychod = -1   
+    }
+
+    public class AmountCategoryIncosistencyException : Exception
+    {
+        //wyrzucane jeśli przychód ma dodatnią kwotę lub wydatek ujemną
+        public AmountCategoryIncosistencyException()
+        {         
+        }
+        public AmountCategoryIncosistencyException(string message)
+        {
+            Console.WriteLine(message);
+        }
+
     }
 
     [DataContract(Namespace="DziennikWydatkow")]
@@ -39,8 +53,10 @@ namespace DziennikWydatkow
         public string Note;
 
 
-        public Expense(DateTime _TransactionDate, decimal _amount,  Categories _Category, string _Title, string _Note)
+        public Expense(DateTime _TransactionDate, decimal _amount,  Categories _Category, string _Title, string _Note) 
         {
+            if ((int)_Category * _amount < 0) //przychód ma dodatnią kwotę lub wydatek ujemną
+                throw new AmountCategoryIncosistencyException("Wydatki powinny mieć kwotę dodatnią, a przychody ujemną.");
             TransactionDate = _TransactionDate;
             Amount = _amount;
             Category = _Category;
