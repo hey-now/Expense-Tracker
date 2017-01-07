@@ -17,8 +17,9 @@ namespace DziennikWydatkow
         Rozrywka,
         Okazjonalne,
         Transport,
-        Inne = 0,
+        Inne,
         Przychod = -1   
+        //Kwota wpisu powina być tego samego znaku co id jego kategorii
     }
 
     public class AmountCategoryIncosistencyException : Exception

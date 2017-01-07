@@ -41,11 +41,6 @@ namespace DziennikWydatkow
            return ExpenseList.Remove(e);
         }
 
-        public void edit(int index,Expense changed)
-        {
-            ExpenseList[index] = changed;
-        }
-
         public void editAmountOf(int index, decimal amount)
         {
             Expense changed = ExpenseList[index];

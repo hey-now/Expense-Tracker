@@ -11,7 +11,7 @@ namespace DziennikWydatkow
         private static Users users;
         private static User user;
 
-        static void login()
+        private static void login()
         {
             Console.WriteLine("\n[LOGOWANIE]\n");
             Console.Write("Podaj nazwę użytkownika: ");
@@ -26,15 +26,23 @@ namespace DziennikWydatkow
 
             Console.Write("Podaj hasło: ");
             string pass = Console.ReadLine();
+            User u = users.UserList.Find(x => String.Compare(x.Username, login) == 0);
+            int i = 1;
 
-            while (!users.UserList.Find(x => String.Compare(x.Username, login) == 0).checkPassword(pass))
+            while (!u.checkPassword(pass))
             {
+                if (i>2)
+                {
+                    Console.WriteLine("Podano złe hasło 3 razy. Powrót do menu.");
+                    return;
+                }
                 Console.WriteLine("Podano złe hasło, spróbuj ponownie.");
                 Console.Write("Podaj hasło: ");
                 pass = Console.ReadLine();
+                i++;
             }
 
-            user = users.UserList.Find(x => String.Compare(x.Username, login) == 0);
+            user = u;
             user.Expenses = new ExpenseTracker();
             user.Expenses.Deserialize(user.Username);
 
@@ -45,7 +53,7 @@ namespace DziennikWydatkow
             return;
         }
 
-        static void newAccount()
+        private static void newAccount()
         {
             Console.WriteLine("\n[NOWE KONTO]\n");
             Console.WriteLine("Podaj nazwę użytkownika:");
@@ -73,7 +81,7 @@ namespace DziennikWydatkow
             return;
         }
 
-        public static void mainMenu()
+        private static void mainMenu()
         {
 
             int userInput = 0;
@@ -125,8 +133,25 @@ namespace DziennikWydatkow
         private static void passwordChange()
         {
             Console.WriteLine("\n[ZMIANA HASŁA]\n");
-            Console.WriteLine("Podaj nowe hasło:");
+
             string pass = Console.ReadLine();
+            int i = 0;
+
+            while (!user.checkPassword(pass))
+            {
+                if (i > 2)
+                {
+                    Console.WriteLine("Podano złe hasło 3 razy. Powrót do menu.");
+                    return;
+                }
+                Console.WriteLine("Podano złe hasło, spróbuj ponownie.");
+                Console.Write("Podaj hasło: ");
+                pass = Console.ReadLine();
+                i++;
+            }
+
+            Console.WriteLine("/nPodaj nowe hasło:");
+            pass = Console.ReadLine();
 
             user.changePassword(pass);
 
@@ -143,7 +168,7 @@ namespace DziennikWydatkow
             int userInput = 0;
             do
             {
-                Console.WriteLine("Jaki typ raportu chcesz zobaczyć?");
+                Console.WriteLine("\nJaki typ raportu chcesz zobaczyć?");
                 Console.WriteLine("1 - Raport ogólny");
                 Console.WriteLine("2 - Raport kategorii");
                 Console.WriteLine("3 - Raport największych wydatków");
@@ -164,13 +189,11 @@ namespace DziennikWydatkow
 
                 if (userInput == 0) return;
 
-                Console.WriteLine("Podaj date poczatkową (w formacie dd/mm/yyyy):");
+                Console.Write("Podaj date poczatkową (w formacie dd/mm/yyyy): ");
                 DateTime startDate = chooseDate();
 
-                Console.WriteLine("Podaj date końcową (w formacie dd/mm/yyyy):");
+                Console.Write("Podaj date końcową (w formacie dd/mm/yyyy): ");
                 DateTime endDate = chooseDate();
-
-                Console.WriteLine(startDate.ToString() + endDate);
 
                 switch (userInput)
                 {
@@ -184,7 +207,7 @@ namespace DziennikWydatkow
                         user.Expenses.GenerateCategoryReport(startDate, endDate, category, sorttype);
                         break;
                     case 3:
-                        Console.WriteLine("Ile maksymalnych wydatków chcesz wylistować?");
+                        Console.Write("Ile maksymalnych wydatków chcesz wylistować? ");
                         string input = Console.ReadLine();
                         int n = Convert.ToInt32(input);
                         user.Expenses.GenerateMaxExpensesReport(startDate, endDate, n);
@@ -236,7 +259,7 @@ namespace DziennikWydatkow
         {
             //Wybór sortowania przez użytkownika
 
-            Console.WriteLine("\n Lista typów sortowania");
+            Console.WriteLine("\nLista typów sortowania");
             List<Sorting> sortingList = Enum.GetValues(typeof(Sorting)).Cast<Sorting>().ToList();
             foreach (Sorting s in sortingList)
             {

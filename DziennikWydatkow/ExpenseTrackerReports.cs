@@ -51,9 +51,9 @@ namespace DziennikWydatkow
                       where ( e.TransactionDate > startDate && e.TransactionDate <endDate)
                       select e;
 
-            decimal balance = report.Sum(e => e.Amount);
+            decimal balance = -report.Sum(e => e.Amount);
 
-            Console.WriteLine("Bilans wydatków: {0}\n", balance.ToString("C"));
+            Console.WriteLine("Bilans konta: {0}\n", balance.ToString("C"));
 
             decimal ExpenseSum = tracker.ExpenseList.Sum(x => ((int)x.Category == -1) ? 0 : x.Amount); //suma wydatków i.e. wpisow z kategorii innych niż prychod (-1)
             decimal IncomeSum = tracker.ExpenseList.Sum(x => ((int)x.Category == -1) ? x.Amount : 0);
