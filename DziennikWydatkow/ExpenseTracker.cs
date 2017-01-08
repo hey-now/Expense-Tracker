@@ -19,7 +19,7 @@ namespace DziennikWydatkow
             ExpenseList = new List<Expense>();
         }
 
-        public Expense this[int index]    // Indexer declaration  
+        public Expense this[int index]    
         {
             get
             {
@@ -93,7 +93,7 @@ namespace DziennikWydatkow
                          select e;
 
                       
-            Console.WriteLine("  Nr  | {0,-10} | {1,-10} | {2,-15} | {3,-20} | {4,-40}|", "1. Data", "2. Kwota", "3. Kategoria", "4. Tytuł", "5. Notatka");
+            Console.WriteLine("\n  Nr  | {0,-10} | {1,-10} | {2,-15} | {3,-20} | {4,-40}|", "1. Data", "2. Kwota", "3. Kategoria", "4. Tytuł", "5. Notatka");
             Console.WriteLine(new string('-', 116));
             foreach (Expense expense in report.ToList())
             {

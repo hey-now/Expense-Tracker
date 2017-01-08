@@ -19,7 +19,7 @@ namespace DziennikWydatkow
         Transport,
         Inne,
         Przychod = -1   
-        //Kwota wpisu powina być tego samego znaku co id jego kategorii
+        //Kwota wpisu powinna być tego samego znaku co reprezentacja liczbowa jego kategorii
     }
 
     public class AmountCategoryIncosistencyException : Exception

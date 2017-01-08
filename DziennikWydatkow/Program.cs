@@ -266,7 +266,7 @@ namespace DziennikWydatkow
                 Console.WriteLine((int)s + " - " + s.ToString());
             }
 
-            Console.WriteLine("Nr typu sortowania: ");
+            Console.Write("Nr typu sortowania: ");
 
             string input = Console.ReadLine();
             Sorting  sort = (Sorting)Convert.ToInt32(input);
@@ -325,22 +325,23 @@ namespace DziennikWydatkow
             Console.Write("Podaj date końcową (w formacie dd/mm/yyyy): ");
             DateTime endDate = chooseDate();
 
-            user.Expenses.printWithIndexes(startDate,endDate);
-
-            Console.WriteLine("Podaj nr wpisu do edycji:");
-            string input = Console.ReadLine();
-            int nr = Convert.ToInt32(input);
 
             int userInput = 0;
             do
             {
-                Console.WriteLine("Wybrano: ");        
+                user.Expenses.printWithIndexes(startDate, endDate);
+
+                Console.WriteLine("\nPodaj nr wpisu do edycji:");
+                string input = Console.ReadLine();
+                int nr = Convert.ToInt32(input);
+
+                Console.WriteLine("\nWybrano: ");        
                 Console.WriteLine("| {0,-10} | {1,-10} | {2,-15} | {3,-20} | {4,-40}|", "1. Data", "2. Kwota", "3. Kategoria", "4. Tytuł", "5. Notatka");
                 Console.WriteLine(new string('-', 110));
                 Console.WriteLine(user.Expenses[nr].ToString() + "\n");
 
-                Console.WriteLine("1 - Usuń");
-                Console.WriteLine("2 - Edytuj");
+                Console.WriteLine("\n1 - Usuń wpis");
+                Console.WriteLine("2 - Edytuj wpis");
                 Console.WriteLine("0 - Zapisz i zakończ");
 
                 string result = Console.ReadLine();
@@ -350,7 +351,6 @@ namespace DziennikWydatkow
                 }
                 catch (System.FormatException e)
                 {
-                    Console.WriteLine("Nieprawidłowe dane. Oczekiwano cyfry, podano: " + result);
                     userInput = -1;
                 }
 
@@ -360,7 +360,7 @@ namespace DziennikWydatkow
                         if (user.Expenses.remove(user.Expenses[nr])) Console.WriteLine("Usunięto wpis");
                         break;
                     case 2:
-                        Console.WriteLine("Podaj nr kolumny do edycji:");
+                        Console.Write("Podaj nr kolumny do edycji:");
                         input = Console.ReadLine();
                         int col = 0;
                         try
@@ -384,12 +384,12 @@ namespace DziennikWydatkow
                                     user.Expenses.editCategoryOf(nr, category);
                                     break;
                             case 4:
-                                    Console.WriteLine("Podaj nowy tutuł: ");
+                                    Console.Write("Podaj nowy tutuł: ");
                                     input = Console.ReadLine();
                                     user.Expenses.editTitleOf(nr, input);
                                     break;
                             case 5:
-                                    Console.WriteLine("Podaj nową notatkę: ");
+                                    Console.Write("Podaj nową notatkę: ");
                                     input = Console.ReadLine();
                                     user.Expenses.editNoteOf(nr, input);
                                     break;
@@ -400,7 +400,7 @@ namespace DziennikWydatkow
                         }
 
                         
-                            Console.WriteLine("Obecny wpis: ");
+                            Console.WriteLine("\nObecny wpis: ");
                             Console.WriteLine("| {0,-10} | {1,-10} | {2,-15} | {3,-20} | {4,-40}|", "1. Data", "2. Kwota", "3. Kategoria", "4. Tytuł", "5. Notatka");
                             Console.WriteLine(new string('-', 110));
                             Console.WriteLine(user.Expenses[nr].ToString() + "\n");
@@ -408,7 +408,7 @@ namespace DziennikWydatkow
                         }
                         catch (AmountCategoryIncosistencyException e)
                         {
-                            Console.WriteLine("Spróbuj ponownie.");
+                            Console.WriteLine("Operacja nie została wykonana, spróbuj ponownie.");
                         }
                         catch (System.FormatException e)
                         {
@@ -417,13 +417,37 @@ namespace DziennikWydatkow
                         break;
                     case 0:
                         user.Expenses.Serialize(user.Username);
+                        Console.WriteLine("Zmiany zostały zapisane\n");
                         return;
-                    case -1:
-                        break;
                     default:
-                        Console.WriteLine("Nieprawidłowe dane. Oczekiwano cyfry z zakresu 0-2, podano: " + userInput);
+                        Console.WriteLine("Nieprawidłowe dane. Oczekiwano cyfry z zakresu 0-2, podano: " + result);
                         break;
                 }
+
+
+
+                Console.WriteLine("\n1 - Edytuj kolejny wpis");
+                Console.WriteLine("0 - Zapisz i zakończ");
+
+                result = Console.ReadLine();
+                try
+                {
+                    userInput = Convert.ToInt32(result);
+                }
+                catch (System.FormatException e)
+                {
+                    Console.WriteLine("Nieprawidłowe dane. Oczekiwano cyfry, podano: " + result);
+                    userInput = 0;
+                }
+
+                if (userInput == 0)
+                {     
+                    user.Expenses.Serialize(user.Username);
+                    Console.WriteLine("Zmiany zostały zapisane\n");
+                    return;
+                }
+
+
 
             } while (userInput != 0);
 
@@ -485,24 +509,39 @@ namespace DziennikWydatkow
             int userInput = 0;
             do
             {
+                Console.WriteLine("\n[DZIENNIK WYDATKÓW]\n");
                 Console.WriteLine("1 - Zaloguj");
                 Console.WriteLine("2 - Nowe konto");
                 Console.WriteLine("0 - Zakończ");
 
                 string result = Console.ReadLine();
-                userInput = Convert.ToInt32(result);
 
-                switch (userInput)
+                try
                 {
-                    case 1:
-                        login();
-                        break;
-                    case 2:
-                        newAccount();
-                        break;
-                    case 0:
-                        break;
-                                    
+                    userInput = Convert.ToInt32(result);
+                
+
+                    switch (userInput)
+                    {
+                        case 1:
+                            login();
+                            break;
+                        case 2:
+                            newAccount();
+                            break;
+                        case 0:
+                            break;
+                        default:
+                            Console.WriteLine("Nieprawidłowe dane. Oczekiwano cyfry z zakresu 0-2, podano: " + result);
+                            break;
+
+                    }
+                        
+                }
+                catch (System.FormatException e)
+                {
+                    Console.WriteLine("Nieprawidłowe dane. Oczekiwano cyfry, podano: " + result);
+                    userInput = -1;
                 }
 
             } while (userInput != 0);

@@ -1,0 +1,1 @@
+<ArrayOfExpense xmlns="DziennikWydatkow" xmlns:i="http://www.w3.org/2001/XMLSchema-instance"><Expense><Amount>200</Amount><Category>Inne</Category><Note/><Title>Karnet na silownie</Title><TransactionDate>2017-01-01T00:00:00</TransactionDate></Expense></ArrayOfExpense>
