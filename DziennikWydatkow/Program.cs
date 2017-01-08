@@ -73,7 +73,7 @@ namespace DziennikWydatkow
             user = newUser;
             user.Expenses.Deserialize(user.Username);
 
-
+            users.Serialize();
             Console.WriteLine("Nowe konto utworzone. Użytkownik zalogowany.");
 
             mainMenu();
@@ -154,6 +154,7 @@ namespace DziennikWydatkow
             pass = Console.ReadLine();
 
             user.changePassword(pass);
+            users.Serialize();
 
             Console.WriteLine("Hasło zmienione.");
 
@@ -351,7 +352,7 @@ namespace DziennikWydatkow
                 }
                 catch (System.FormatException e)
                 {
-                    userInput = -1;
+                    userInput = -1; //aby wpaść w default case switcha poniżej
                 }
 
                 switch (userInput)
@@ -503,8 +504,6 @@ namespace DziennikWydatkow
 
 
             users.Deserialize();
-
-            
 
             int userInput = 0;
             do

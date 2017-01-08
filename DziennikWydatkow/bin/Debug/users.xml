@@ -1,1 +1,1 @@
-<ArrayOfUser xmlns="DziennikWydatkow" xmlns:i="http://www.w3.org/2001/XMLSchema-instance"><User><Password>maslo1</Password><Username>Maja</Username></User></ArrayOfUser>
+<ArrayOfUser xmlns="DziennikWydatkow" xmlns:i="http://www.w3.org/2001/XMLSchema-instance"><User><Password>maslo1</Password><Username>Maja</Username></User><User><Password>adamadam</Password><Username>adam</Username></User></ArrayOfUser>
